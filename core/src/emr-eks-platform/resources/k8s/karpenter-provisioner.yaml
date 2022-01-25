@@ -1,15 +1,15 @@
 apiVersion: karpenter.sh/v1alpha5
 kind: Provisioner
 metadata:
-  name: spark-driver
+  name: notebook
 spec:
   requirements:
     - key: karpenter.sh/capacity-type
       operator: In
-      values: ['on-demand']
+      values: ['spot']
     - key: 'node.kubernetes.io/instance-type'
       operator: In
-      values: ['m5.large']
+      values: ['t3.2xlarge']
     - key: 'topology.kubernetes.io/zone'
       operator: In
       values: ['eu-west-1a', 'eu-west-1b']
@@ -17,11 +17,8 @@ spec:
     resources:
       cpu: 1000
   labels:
-    arch: x86
-    disk: none
-    capacitytype: on-demand
-    noderole: spark
-    type: karpenter
+    role: notebook
+    node-lifecycle: spot
   provider:
     instanceProfile: KarpenterNodeInstanceProfile-data-platform
     subnetSelector:
@@ -33,6 +30,8 @@ spec:
     #launchTemplate: eksctl-spark-eks-best-practices-nodegroup-spark-spot-nvme-1a
     #launchTemplate: eksctl-spark-eks-best-practices-nodegroup-spark-od-1a
     tags:
+      karpenter.sh/capacity-type: spot
+      karpenter.sh/role: notebook
       # k8s.io/cluster-autoscaler/node-template/label/arch: x86
       # k8s.io/cluster-autoscaler/node-template/label/kubernetes.io/os: linux
       # k8s.io/cluster-autoscaler/node-template/label/noderole: spark
